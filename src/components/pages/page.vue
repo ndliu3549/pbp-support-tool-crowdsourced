@@ -533,7 +533,7 @@
 			
 			console.log('hello2-1')
 			
-//			this.getView(URL_id);
+			this.getView(URL_id);
 			
 //			console.log('groupArray.length = ' + groupArray.length)
 			
@@ -691,7 +691,7 @@
 
 //				var R_groupID = groupArray[parseInt(Math.random()*groupArray.length)];
 				
-				var R_group = new Array(5);
+				var R_group = new Array(10);
 				
 //				console.log('R_group.length = ' + R_group.length)
 				
@@ -766,7 +766,7 @@
 	
 					console.log('URL_id = ' + URL_id)
 	
-					URL_id = '1234'
+//					URL_id = '1234'
 	
 					if (URL_id != null) {
 						list = `
