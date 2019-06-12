@@ -4,36 +4,38 @@
 			<h2>CPBL PLAY BY PLAY Support Tool</h2>
 
 			<div>
-				<a class='btn btn-light' href="http://localhost:8080/">Refresh Page</a>
+				<a class='btn btn-light' href="http://localhost:8080/">
+					Refresh Page（測試用）
+				</a>
 
-				<button class='btn btn-light' type='button' @click='NewImport(ImportData)'>
+				<!--<button class='btn btn-light' type='button' @click='NewImport(ImportData)'>
 					Import New LOG
-				</button>
+				</button>-->
 
-				<label for="files" class="custom-file-upload">
+				<!--<label for="files" class="custom-file-upload">
     				<i class="fa fa-cloud-upload"></i> Select File（CSV）
 				</label>
 
-				<input id="files" type="file" name="files[]" multiple/>
+				<input id="files" type="file" name="files[]" multiple/>-->
 
-				<button class='btn btn-light' type='button' @click='OldImport(ImportData)'>
+				<!--<button class='btn btn-light' type='button' @click='OldImport(ImportData)'>
 					Import Old LOG
-				</button>
+				</button>-->
 				<!--</div>
 
 			<div>-->
-				<button class='btn btn-light' type='button' @click="getExportJSON">
+				<!--<button class='btn btn-light' type='button' @click="getExportJSON">
 					<downloadExcel :data="exportjson" :fields="json_fields" type="csv" name="Old LOG.csv">
 						Export Old LOG（Double Click）
 					</downloadExcel>
-				</button>
+				</button>-->
 
-				<button class='btn btn-light' type='button' @click='CleanData()'>
+				<!--<button class='btn btn-light' type='button' @click='CleanData()'>
 					Clean Data
-				</button>
+				</button>-->
 
-				<button type="button" class="btn btn-dark" data-toggle="collapse" data-target="#readme" @click='Readme()'>
-					Readme
+				<button type="button" class="btn btn-light" data-toggle="collapse" data-target="#readme" @click='Readme()'>
+					操作示範
 				</button>
 			</div>
 
@@ -582,7 +584,7 @@
 
 					let list = '';
 
-					var R_group = new Array(10);
+					var R_group = new Array(20);
 
 					var Flag = true;
 
@@ -714,7 +716,7 @@
 					list = `
 						${list}
 						<br>
-						<button id='finish' type='button' class='finish btn btn-secondary'>完成</button>
+						<button id='finish' type='button' class='finish btn btn-secondary'>提交作答</button>
 					`
 
 					$('h5').html(list)
@@ -724,7 +726,7 @@
 						var option_ID = document.getElementById(select_ID);
 						
 						var option = document.createElement('option');
-						option.text = ''
+						option.text = '---------'
 						option_ID.add(option);
 						
 						var option = document.createElement('option');
