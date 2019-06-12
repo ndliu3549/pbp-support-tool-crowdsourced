@@ -735,7 +735,7 @@
 							var option = document.createElement('option');
 							option.text = PlayerListGroup[index][player_index];
 //							console.log('OPTION =' + option.text)
-							if (option.text != '')
+							if ( (option.text != '') && (option.text != '/') )
 								option_ID.add(option);
 						}
 					}
