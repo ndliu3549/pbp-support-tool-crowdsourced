@@ -7,33 +7,7 @@
 				<a class='btn btn-light' href="http://localhost:8080/">
 					Refresh Page（測試用）
 				</a>
-
-				<!--<button class='btn btn-light' type='button' @click='NewImport(ImportData)'>
-					Import New LOG
-				</button>-->
-
-				<!--<label for="files" class="custom-file-upload">
-    				<i class="fa fa-cloud-upload"></i> Select File（CSV）
-				</label>
-
-				<input id="files" type="file" name="files[]" multiple/>-->
-
-				<!--<button class='btn btn-light' type='button' @click='OldImport(ImportData)'>
-					Import Old LOG
-				</button>-->
-				<!--</div>
-
-			<div>-->
-				<!--<button class='btn btn-light' type='button' @click="getExportJSON">
-					<downloadExcel :data="exportjson" :fields="json_fields" type="csv" name="Old LOG.csv">
-						Export Old LOG（Double Click）
-					</downloadExcel>
-				</button>-->
-
-				<!--<button class='btn btn-light' type='button' @click='CleanData()'>
-					Clean Data
-				</button>-->
-
+				
 				<button type="button" class="btn btn-light" data-toggle="collapse" data-target="#readme" @click='Readme()'>
 					操作示範
 				</button>
@@ -67,6 +41,7 @@
 	firebase.initializeApp(config);
 
 	var BaseballRef = firebase.database().ref('Baseball');
+	var Error_BaseballRef = firebase.database().ref('Error_Baseball');
 	var idArray = Array();
 	var groupArray = Array();
 	var PlayerListGroup = Array();
@@ -112,159 +87,6 @@
 				list.options[index] = new Option(text, value);
 				list.selectedIndex = index;
 			},
-			getLog() {
-
-				console.log('hello1')
-
-				BaseballRef.on('value', function(snapshot) {
-					let val = snapshot.val();
-					let inning = '';
-					let arrayHeader = '';
-
-					$.each(val, function(i, item) {
-
-						if(inning != item.inning) {
-
-							inning = item.inning
-
-							//							console.log('arrayHeader = ' + i)
-
-							arrayHeader = i;
-
-							idArray[arrayHeader] = Array();
-
-						}
-
-						idArray[arrayHeader].push(i);
-					});
-
-				});
-
-				let list = '';
-
-				var R_group = new Array(5);
-
-				var Flag = true;
-
-				for(var i = 0; i < R_group.length; i++) {
-
-					R_group[i] = groupArray[parseInt(Math.random() * groupArray.length)];
-				}
-
-				for(var i = 0; i < R_group.length; i++) {
-
-					console.log('R_group[' + i + '] = ' + R_group[i])
-
-					for(var index in idArray[R_group[i]]) {
-
-						console.log('idArray[R_group[i]] = ' + idArray[R_group[i]])
-
-						var ID = idArray[R_group[i]][index];
-
-						console.log(ID)
-
-						firebase.database().ref('/Baseball/' + ID).on('value', function(snapshot) {
-
-							let val = snapshot.val();
-
-							list = `
-							${list}
-							<div style='margin:5px 5px 5px 5px; text-align:center' class="col">
-								<pre style='font-weight:bold'>${val.log}</pre>
-								<input disabled id='input_Player${ID}' style='text-align:center; width:70px' value=${val.Player} />
-								<input disabled id='input_base1${ID}' style='text-align:center; width:70px' value=${val.base1} />
-								<input disabled id='input_base2${ID}' style='text-align:center; width:70px' value=${val.base2} />
-								<input disabled id='input_base3${ID}' style='text-align:center; width:70px' value=${val.base3} />
-								<input disabled id='input_id${ID}' style='text-align:center; width:70px' value=${val.id} />
-								<input disabled id='input_direction${ID}' style='text-align:center; width:40px' value=${val.direction} />
-								<input disabled id='input_out${ID}' style='text-align:center; width:70px' value=${val.out} />
-								<input disabled id='input_result${ID}' style='text-align:center; width:320px' value=${val.result} />
-							</div>
-						`
-						});
-					}
-
-					list = `
-						${list}
-						<div style='margin:10px 10px 10px 10px; text-align:center' class="col">
-							<button id='enable_modify${R_group[i]}'
-								type='button' class='enable btn btn-light' data-key=${R_group[i]}>Enable</button>
-							<button disabled id='summit_modify${R_group[i]}'
-								type='button' class='summit btn btn-light' data-key=${R_group[i]}>Commit</button>
-						</div>
-					`
-
-				}
-
-				$('h5').html(list)
-
-				$('#h5').on('click', '.enable', function() {
-
-					var key = $(this).data('key');
-
-					for(var index in idArray[key]) {
-
-						$('#input_Player' + idArray[key][index]).attr('disabled', false);
-						$('#input_base1' + idArray[key][index]).attr('disabled', false);
-						$('#input_base2' + idArray[key][index]).attr('disabled', false);
-						$('#input_base3' + idArray[key][index]).attr('disabled', false);
-						$('#input_id' + idArray[key][index]).attr('disabled', false);
-						$('#input_direction' + idArray[key][index]).attr('disabled', false);
-						$('#input_out' + idArray[key][index]).attr('disabled', false);
-						$('#input_result' + idArray[key][index]).attr('disabled', false);
-						$('#summit_modify' + idArray[key][index]).attr('disabled', false);
-
-						$('#enable_modify' + idArray[key][index]).attr('disabled', true);
-					}
-				});
-
-				$('#h5').on('click', '.summit', function() {
-
-					var key = $(this).data('key');
-
-					var dataArray = Array();
-
-					for(var index in idArray[key]) {
-
-						dataArray[index] = Array();
-						dataArray[index][0] = $('#input_Player' + idArray[key][index]).val()
-						dataArray[index][1] = $('#input_base1' + idArray[key][index]).val()
-						dataArray[index][2] = $('#input_base2' + idArray[key][index]).val()
-						dataArray[index][3] = $('#input_base3' + idArray[key][index]).val()
-						dataArray[index][4] = $('#input_id' + idArray[key][index]).val()
-						dataArray[index][5] = $('#input_direction' + idArray[key][index]).val()
-						dataArray[index][6] = $('#input_out' + idArray[key][index]).val()
-						dataArray[index][7] = $('#input_result' + idArray[key][index]).val()
-					}
-
-					for(var index in idArray[key]) {
-
-						BaseballRef.child(idArray[key][index]).update({
-							'Player': dataArray[index][0],
-							'base1': dataArray[index][1],
-							'base2': dataArray[index][2],
-							'base3': dataArray[index][3],
-							'id': dataArray[index][4],
-							'direction': dataArray[index][5],
-							'out': dataArray[index][6],
-							'result': dataArray[index][7]
-						});
-
-						$('#input_Player' + idArray[key][index]).attr('disabled', true);
-						$('#input_base1' + idArray[key][index]).attr('disabled', true);
-						$('#input_base2' + idArray[key][index]).attr('disabled', true);
-						$('#input_base3' + idArray[key][index]).attr('disabled', true);
-						$('#input_id' + idArray[key][index]).attr('disabled', true);
-						$('#input_direction' + idArray[key][index]).attr('disabled', true);
-						$('#input_out' + idArray[key][index]).attr('disabled', true);
-						$('#input_result' + idArray[key][index]).attr('disabled', true);
-						$('#summit_modify' + idArray[key][index]).attr('disabled', true);
-
-						$('#enable_modify' + idArray[key][index]).attr('disabled', false);
-					}
-				});
-
-			},
 			getUrlKey(name) {
 				return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
 			},
@@ -283,75 +105,6 @@
 				`
 
 				$('h6').html(list)
-			},
-			getExportJSON() {
-				let vm = this;
-				BaseballRef.on('value', function(snapshot) {
-					let val = snapshot.val();
-					$.each(val, function(i, item) {
-						vm.exportjson.push(item);
-					});
-				});
-			},
-			CleanData() {
-				BaseballRef.remove();
-			},
-			OldImport(ImportData) {
-
-				for(var i = 0; i < ImportData.length; i++) {
-
-					window['LogID_' + i] = {
-						game: ImportData[i].game,
-						team: ImportData[i].team,
-						inning: ImportData[i].inning,
-						log: ImportData[i].log,
-						Player: ImportData[i].Player,
-						base1: ImportData[i].base1,
-						base2: ImportData[i].base2,
-						base3: ImportData[i].base3,
-						id: ImportData[i].id,
-						direction: ImportData[i].direction,
-						out: ImportData[i].out,
-						result: ImportData[i].result
-					}
-
-					firebase.database().ref('Baseball/LogID_' + i).set(window['LogID_' + i])
-				}
-			},
-			NewImport(ImportData) {
-				let away = '';
-				let home = '';
-				let firstPart = '';
-				let secondPart = '';
-				let thirdPart = '';
-
-				for(var i = 0; i < ImportData.length; i++) {
-
-					if(ImportData[i].Player != '') {
-
-						if(firstPart != ImportData[i].numforgame)
-							if(ImportData[i].numforgame != '') firstPart = ImportData[i].numforgame;
-
-						secondPart = ImportData[i].away + ' VS ' + ImportData[i].home
-
-						if(thirdPart != ImportData[i].inning) thirdPart = ImportData[i].inning;
-
-						BaseballRef.push({
-							game: firstPart,
-							team: secondPart,
-							inning: thirdPart,
-							log: ImportData[i].log,
-							Player: ImportData[i].Player,
-							base1: ImportData[i].base1,
-							base2: ImportData[i].base2,
-							base3: ImportData[i].base3,
-							id: ImportData[i].id,
-							direction: ImportData[i].direction,
-							out: ImportData[i].out,
-							result: ImportData[i].result
-						})
-					}
-				}
 			},
 			getImport() {
 
@@ -435,17 +188,12 @@
 
 							idArray[arrayHeader] = Array();
 
-							//							PlayerListGroup.push(arrayHeader);
-
-							//							PlayerListGroup[arrayHeader] = Array();
-
 							groupArray.push(arrayHeader);
 
 						}
 
 						idArray[arrayHeader].push(i);
 
-						//						PlayerListGroup[arrayHeader].push(i);
 					});
 
 					console.log('groupArray = ' + groupArray)
@@ -456,14 +204,6 @@
 			}
 		},
 		mounted() {
-
-//			this.$http.get('https://jsonplaceholder.typicode.com/users').then((response) => {
-//				console.log('成功')
-//				// success callback
-//			}, (response) => {
-//				console.log('失敗')
-//				// error callback
-//			});
 
 			this.getImport();
 
@@ -478,73 +218,6 @@
 
 				window.setTimeout(function() {
 					console.log('function A');
-
-//					BaseballRef.on('value', function(snapshot) {
-//
-//						console.log('hello2-2')
-//
-//						let val = snapshot.val();
-//						let list = '';
-//						let inning = '';
-//						let arrayHeader = '';
-//						let itemGame = '';
-//
-//						list = `
-//						<div style='font-weight:bold; margin:5px 100px 5px 5px; float:right'>
-//								URL_id = ${URL_id}
-//						</div>
-//					`
-//
-//						list = `
-//						${list}
-//						<div>
-//					`
-//
-//						$.each(val, function(i, item) {
-//
-//							if(itemGame != item.game) {
-//								itemGame = item.game;
-//
-//								list = `
-//								${list}
-//								</div>
-//								<div style='margin:5px 5px 5px 5px'>
-//									<button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#clapsme${itemGame}">
-//										第 ${itemGame} 場
-//									</button>
-//								</div>
-//								<div id='clapsme${itemGame}' class="collapse">
-//							`
-//							}
-//
-//							if(inning != item.inning) {
-//
-//								list = `
-//								${list}
-//								<a id="${i}" href="#/child/${i}" style='margin:5px 5px 5px 5px'
-//									class="router-link-exact-active router-link-active btn btn-secondary ">
-//										第${item.game}場：${item.team}：${item.inning}
-//								</a>
-//							`
-//
-//								inning = item.inning
-//
-//								arrayHeader = i;
-//
-//								idArray[arrayHeader] = Array();
-//
-//								groupArray.push(arrayHeader);
-//
-//							}
-//
-//							idArray[arrayHeader].push(i);
-//						});
-//
-//						console.log('groupArray = ' + groupArray)
-//
-//						$('ul').html(list)
-//
-//					});
 
 					// 如果 callback 是個函式就呼叫它
 					if(typeof callback === 'function') {
@@ -624,9 +297,12 @@
 					var randomGroupArray = getRandomArray(0, groupArray.length-1, R_group.length);
 					console.log('randomGroupArray = ' + randomGroupArray)
 
+					var PageLogRandomArray = getRandomArray(0, 19, 20);
+					var OkLogRandomArray = PageLogRandomArray.slice(0 , 10);
+					var ErrLogRandomArray = PageLogRandomArray.slice(10, 20);
+
 					for(var i = 0; i < R_group.length; i++) {
 
-//						R_group[i] = groupArray[parseInt(Math.random() * groupArray.length)];
 						R_group[i] = groupArray[randomGroupArray[i]];
 						console.log('R_group[' + i + '] = ' + R_group[i])
 
@@ -636,15 +312,26 @@
 
 					for(var i = 0; i < R_group.length; i++) {
 
+
 						console.log('R_group[' + i + '] = ' + R_group[i])
 
-						list = `
-							${list}
-							<div style='margin:10px 10px 10px 10px; text-align:center' class="col">
-								<br>
-								【第 ${i+1} 局】
-							</div>
-						`
+						if ($.inArray(i, OkLogRandomArray) != -1) {
+							list = `
+								${list}
+								<div style='margin:10px 10px 10px 10px; text-align:center' class="col">
+									<br>
+									【第 ${i+1} 局】OK
+								</div>
+							`
+						} else if ($.inArray(i, ErrLogRandomArray) != -1) {
+							list = `
+								${list}
+								<div style='margin:10px 10px 10px 10px; text-align:center' class="col">
+									<br>
+									【第 ${i+1} 局】ERR
+								</div>
+							`
+						}
 
 						PlayerListGroup[R_group[i]] = Array();
 
@@ -653,8 +340,6 @@
 							console.log('idArray[R_group[i]] = ' + idArray[R_group[i]])
 
 							var ID = idArray[R_group[i]][index];
-
-							console.log(ID)
 
 							firebase.database().ref('/Baseball/' + ID).on('value', function(snapshot) {
 
@@ -665,9 +350,33 @@
 									<div style='margin:5px 5px 5px 5px; text-align:center' class="col">
 										<pre style='font-weight:bold'>${val.log}</pre>
 										<input disabled id='input_Player${ID}' style='text-align:center; width:70px' value=${val.Player} />
-										<select id='input_base1${ID}' style='width:100px'></select>
-										<select id='input_base2${ID}' style='width:100px'></select>
-										<select id='input_base3${ID}' style='width:100px'></select>
+								`
+								
+								if ($.inArray(i, OkLogRandomArray) != -1) {
+									list = `
+										${list}
+											<select id='input_base1${ID}' style='width:100px'>
+											<option value =${val.base1}>${val.base1}</option></select>
+											<select id='input_base2${ID}' style='width:100px'>
+											<option value =${val.base2}>${val.base2}</option></select>
+											<select id='input_base3${ID}' style='width:100px'>
+											<option value =${val.base3}>${val.base3}</option></select>
+									`
+								} else if ($.inArray(i, ErrLogRandomArray) != -1) {
+									console.log('ERR_Log ID = ' + ID)
+									list = `
+										${list}
+											<select id='input_err_base1${ID}' style='width:100px'>
+											<option value =${val.err_base1}>${val.err_base1}</option></select>
+											<select id='input_err_base2${ID}' style='width:100px'>
+											<option value =${val.err_base2}>${val.err_base2}</option></select>
+											<select id='input_err_base3${ID}' style='width:100px'>
+											<option value =${val.err_base3}>${val.err_base3}</option></select>
+									`
+								}
+								
+								list = `
+									${list}
 										<input disabled id='input_id${ID}' style='text-align:center; width:70px' value=${val.id} />
 										<input disabled id='input_direction${ID}' style='text-align:center; width:40px' value=${val.direction} />
 										<input disabled id='input_out${ID}' style='text-align:center; width:70px' value=${val.out} />
@@ -688,29 +397,6 @@
 						console.log('URL_id = ' + URL_id)
 
 						URL_id = '1234'
-
-						//					if (URL_id != null) {
-						//						list = `
-						//							${list}
-						//							<div style='margin:10px 10px 10px 10px; text-align:center' class="col">
-						//								<button id='enable_modify${R_group[i]}'
-						//									type='button' class='enable btn btn-light' data-key=${R_group[i]}>Enable</button>
-						//								<button disabled id='summit_modify${R_group[i]}'
-						//									type='button' class='summit btn btn-light' data-key=${R_group[i]}>Commit</button>
-						//							</div>
-						//						`
-						//					} else {
-						//						list = `
-						//							${list}
-						//							<div style='margin:10px 10px 10px 10px; text-align:center' class="col">
-						//								<button id='enable_modify${R_group[i]}'
-						//									type='button' class='enable btn btn-light' data-key=${R_group[i]}>True</button>
-						//								<button disabled id='summit_modify${R_group[i]}'
-						//									type='button' class='summit btn btn-light' data-key=${R_group[i]}>False</button>
-						//							</div>
-						//						`
-						//					}
-
 					}
 
 					list = `
@@ -736,7 +422,6 @@
 						for(var player_index in PlayerListGroup[index]) {
 							var option = document.createElement('option');
 							option.text = PlayerListGroup[index][player_index];
-//							console.log('OPTION =' + option.text)
 							if ( (option.text != '') && (option.text != '/') )
 								option_ID.add(option);
 						}
@@ -748,9 +433,18 @@
 						console.log('idArray[' + G_index + '] = ' + idArray[G_index])
 						
 						for(var idArray_index in idArray[G_index]) {
-							var select_ID_1 = 'input_base1' + idArray[G_index][idArray_index];
-							var select_ID_2 = 'input_base2' + idArray[G_index][idArray_index];
-							var select_ID_3 = 'input_base3' + idArray[G_index][idArray_index];
+							
+							if (!document.getElementById( 'input_base1' + idArray[G_index][idArray_index] )) {
+								console.log('This is ERR Log')
+								var select_ID_1 = 'input_err_base1' + idArray[G_index][idArray_index];
+								var select_ID_2 = 'input_err_base2' + idArray[G_index][idArray_index];
+								var select_ID_3 = 'input_err_base3' + idArray[G_index][idArray_index];
+							} else {
+								var select_ID_1 = 'input_base1' + idArray[G_index][idArray_index];
+								var select_ID_2 = 'input_base2' + idArray[G_index][idArray_index];
+								var select_ID_3 = 'input_base3' + idArray[G_index][idArray_index];
+							}
+
 							PlayerOptionAdd(select_ID_1, G_index);
 							PlayerOptionAdd(select_ID_2, G_index);
 							PlayerOptionAdd(select_ID_3, G_index);
@@ -758,29 +452,17 @@
 					}
 
 					$('#h5').on('click', '.finish', function() {
-						
-//						$.get("https://jsonplaceholder.typicode.com/users",
-//							function(data, status) {
-//								alert("Data: " + data + "\nStatus: " + status);
-//							});
 							
 						$.ajax({
 							type:"patch",
-							url:"https://www.thef2e.com/api/isSignUp",
+//							url:"https://www.thef2e.com/api/isSignUp",
+							url:"https://bountyworkers.net/api/task-report",
 							success: function (data, status) {
 								alert("Status: " + status);
 							}
 						});
-						
-						
-//						$.ajax({
-//							url : 'https://jsonplaceholder.typicode.com/users',
-//							type : 'PATCH',
-//							contentType : 'application/json', processData: false, dataType: 'json' )};
 
 						for(var i = 0; i < R_group.length; i++) {
-
-							//					var key = $(this).data('key');
 
 							var key = R_group[i];
 
@@ -790,9 +472,17 @@
 
 								dataArray[index] = Array();
 								dataArray[index][0] = $('#input_Player' + idArray[key][index]).val()
-								dataArray[index][1] = $('#input_base1' + idArray[key][index]).val()
-								dataArray[index][2] = $('#input_base2' + idArray[key][index]).val()
-								dataArray[index][3] = $('#input_base3' + idArray[key][index]).val()
+								
+								if (!document.getElementById( 'input_base1' + idArray[key][index] )) {
+									dataArray[index][1] = $('#input_err_base1' + idArray[key][index]).val()
+									dataArray[index][2] = $('#input_err_base2' + idArray[key][index]).val()
+									dataArray[index][3] = $('#input_err_base3' + idArray[key][index]).val()
+								} else {
+									dataArray[index][1] = $('#input_base1' + idArray[key][index]).val()
+									dataArray[index][2] = $('#input_base2' + idArray[key][index]).val()
+									dataArray[index][3] = $('#input_base3' + idArray[key][index]).val()
+								}
+
 								dataArray[index][4] = $('#input_id' + idArray[key][index]).val()
 								dataArray[index][5] = $('#input_direction' + idArray[key][index]).val()
 								dataArray[index][6] = $('#input_out' + idArray[key][index]).val()
@@ -802,15 +492,21 @@
 							for(var index in idArray[key]) {
 
 								$('#input_Player' + idArray[key][index]).attr('disabled', false);
-								$('#input_base1' + idArray[key][index]).attr('disabled', false);
-								$('#input_base2' + idArray[key][index]).attr('disabled', false);
-								$('#input_base3' + idArray[key][index]).attr('disabled', false);
+								
+								if (!document.getElementById( 'input_base1' + idArray[key][index] )) {
+									$('#input_err_base1' + idArray[key][index]).attr('disabled', false);
+									$('#input_err_base2' + idArray[key][index]).attr('disabled', false);
+									$('#input_err_base3' + idArray[key][index]).attr('disabled', false);
+								} else {
+									$('#input_base1' + idArray[key][index]).attr('disabled', false);
+									$('#input_base2' + idArray[key][index]).attr('disabled', false);
+									$('#input_base3' + idArray[key][index]).attr('disabled', false);
+								}
+
 								$('#input_id' + idArray[key][index]).attr('disabled', false);
 								$('#input_direction' + idArray[key][index]).attr('disabled', false);
 								$('#input_out' + idArray[key][index]).attr('disabled', false);
 								$('#input_result' + idArray[key][index]).attr('disabled', false);
-								//							$('#summit_modify' + idArray[key][index]).attr('disabled', false);
-								//							$('#enable_modify' + idArray[key][index]).attr('disabled', true);
 							}
 
 							function GroupCompare() {
@@ -870,103 +566,6 @@
 						}
 
 					});
-
-					//				$('#h5').on('click', '.enable', function() {
-					//
-					//					var key = $(this).data('key');
-					//
-					//					for(var index in idArray[key]) {
-					//
-					//						$('#input_Player' + idArray[key][index]).attr('disabled', false);
-					//						$('#input_base1' + idArray[key][index]).attr('disabled', false);
-					//						$('#input_base2' + idArray[key][index]).attr('disabled', false);
-					//						$('#input_base3' + idArray[key][index]).attr('disabled', false);
-					//						$('#input_id' + idArray[key][index]).attr('disabled', false);
-					//						$('#input_direction' + idArray[key][index]).attr('disabled', false);
-					//						$('#input_out' + idArray[key][index]).attr('disabled', false);
-					//						$('#input_result' + idArray[key][index]).attr('disabled', false);
-					//						$('#summit_modify' + idArray[key][index]).attr('disabled', false);
-					//
-					//						$('#enable_modify' + idArray[key][index]).attr('disabled', true);
-					//					}
-					//				});
-					//
-					//				$('#h5').on('click', '.summit', function() {
-					//
-					//					var key = $(this).data('key');
-					//
-					//					var dataArray = Array();
-					//
-					//					for(var index in idArray[key]) {
-					//
-					//						dataArray[index] = Array();
-					//						dataArray[index][0] = $('#input_Player' + idArray[key][index]).val()
-					//						dataArray[index][1] = $('#input_base1' + idArray[key][index]).val()
-					//						dataArray[index][2] = $('#input_base2' + idArray[key][index]).val()
-					//						dataArray[index][3] = $('#input_base3' + idArray[key][index]).val()
-					//						dataArray[index][4] = $('#input_id' + idArray[key][index]).val()
-					//						dataArray[index][5] = $('#input_direction' + idArray[key][index]).val()
-					//						dataArray[index][6] = $('#input_out' + idArray[key][index]).val()
-					//						dataArray[index][7] = $('#input_result' + idArray[key][index]).val()
-					//					}
-					//
-					//					function GroupCompare() {
-					//						
-					//						var Comp = true;
-					//						
-					//						for(var index in idArray[key]) {
-					//	
-					//							BaseballRef.child(idArray[key][index]).once('value',  function(snapshot) {
-					//								
-					//								function LogCompare (DB_Log, Input_Log) {
-					//									if ( (DB_Log != Input_Log) && ( (DB_Log != '') || (Input_Log != '/') ) ) {
-					//										console.log('False: ' + DB_Log + ' V.S. ' + Input_Log)
-					//										return false;
-					//									}
-					//									else
-					//										return true;
-					//								}
-					//								
-					//								if ( LogCompare (snapshot.val().Player, dataArray[index][0]) &&
-					//									LogCompare (snapshot.val().base1, dataArray[index][1]) &&
-					//									LogCompare (snapshot.val().base2, dataArray[index][2]) &&
-					//									LogCompare (snapshot.val().base3, dataArray[index][3]) &&
-					//									LogCompare (snapshot.val().id, dataArray[index][4]) &&
-					//									LogCompare (snapshot.val().direction, dataArray[index][5]) &&
-					//									LogCompare (snapshot.val().out, dataArray[index][6]) &&
-					//									LogCompare (snapshot.val().result, dataArray[index][7]) ) {
-					//									}
-					//									else {
-					//										Comp = false;
-					//									}
-					//										
-					//							} )
-					//							
-					//							$('#input_Player' + idArray[key][index]).attr('disabled', true);
-					//							$('#input_base1' + idArray[key][index]).attr('disabled', true);
-					//							$('#input_base2' + idArray[key][index]).attr('disabled', true);
-					//							$('#input_base3' + idArray[key][index]).attr('disabled', true);
-					//							$('#input_id' + idArray[key][index]).attr('disabled', true);
-					//							$('#input_direction' + idArray[key][index]).attr('disabled', true);
-					//							$('#input_out' + idArray[key][index]).attr('disabled', true);
-					//							$('#input_result' + idArray[key][index]).attr('disabled', true);
-					//							$('#summit_modify' + idArray[key][index]).attr('disabled', true);
-					//
-					//							$('#enable_modify' + idArray[key][index]).attr('disabled', false);
-					//							
-					//						}
-					//						
-					//						if (Comp)
-					//							return true;
-					//						else
-					//							return false;
-					//					}
-					//					
-					//					if (GroupCompare())
-					//						console.log('Input True')
-					//					else
-					//						console.log('Input False')
-					//				});
 
 				}, i * 1000);
 			};

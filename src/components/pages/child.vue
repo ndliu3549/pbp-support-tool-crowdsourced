@@ -20,6 +20,7 @@
 		storageBucket: 'new-firebase-3065e.appspot.com',
 	};
 	var BaseballRef = firebase.database().ref('Baseball');
+	var Error_BaseballRef = firebase.database().ref('Error_Baseball');
 	var idArray = Array();
 	var modifiedArray = Array();
 	export default {
@@ -50,14 +51,6 @@
 				let list = '';
 
 				var groupID = this.$route.params.id;
-
-//				var groupID = 'LogID_0'
-				
-//				console.log('groupID = ' + groupID)
-
-//				console.log('child_groupID: ' + idArray[groupID])
-				
-//				console.log('child_groupID0: ' + idArray[groupID][0])
 
 				for(var index in idArray[this.$route.params.id]) {
 
