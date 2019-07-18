@@ -455,10 +455,14 @@
 							
 						$.ajax({
 							type:"patch",
+							data:"TESTABCDEF",
 //							url:"https://www.thef2e.com/api/isSignUp",
 							url:"https://bountyworkers.net/api/task-report",
 							success: function (data, status) {
 								alert("Status: " + status);
+							},
+							error: function (xhr, ajaxOptions, thrownError) {
+								console.log(xhr.responseText);
 							}
 						});
 
