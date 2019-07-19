@@ -17,6 +17,10 @@
 				<h6 id='h6'></h6>
 			</div>
 
+			<div id='TestURLID'>
+				<ul id='ul'></ul>
+			</div>
+
 			<div id='TestLog'>
 				<h5 id='h5'></h5>
 			</div>
@@ -140,45 +144,16 @@
 					let list = '';
 					let inning = '';
 					let arrayHeader = '';
-					let itemGame = '';
-
+					
 					list = `
-						<div style='font-weight:bold; margin:5px 100px 5px 5px; float:right'>
+						<div style='margin:10px 10px 10px 10px; text-align:center' class="col">
 								URL_id = ${URL_id}
 						</div>
 					`
-
-					list = `
-						${list}
-						<div>
-					`
-
+					
 					$.each(val, function(i, item) {
-
-						if(itemGame != item.game) {
-							itemGame = item.game;
-
-							list = `
-								${list}
-								</div>
-								<div style='margin:5px 5px 5px 5px'>
-									<button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#clapsme${itemGame}">
-										第 ${itemGame} 場
-									</button>
-								</div>
-								<div id='clapsme${itemGame}' class="collapse">
-							`
-						}
-
+						
 						if(inning != item.inning) {
-
-							list = `
-								${list}
-								<a id="${i}" href="#/child/${i}" style='margin:5px 5px 5px 5px'
-									class="router-link-exact-active router-link-active btn btn-secondary ">
-										第${item.game}場：${item.team}：${item.inning}
-								</a>
-							`
 
 							inning = item.inning
 
@@ -189,7 +164,6 @@
 							idArray[arrayHeader] = Array();
 
 							groupArray.push(arrayHeader);
-
 						}
 
 						idArray[arrayHeader].push(i);
@@ -394,9 +368,9 @@
 						}
 						console.log('PlayerListGroup.length = ' + testIndex)
 
-						console.log('URL_id = ' + URL_id)
-
-						URL_id = '1234'
+//						console.log('URL_id = ' + URL_id)
+//
+//						URL_id = '1234'
 					}
 
 					list = `
@@ -453,16 +427,30 @@
 
 					$('#h5').on('click', '.finish', function() {
 							
+						console.log("URL_id = " + URL_id)
+						
+						var TestJSON = JSON.stringify
+						({
+							code: URL_id,
+							report: "完成"
+						})
+						
+						console.log("TestJSON = " + TestJSON)
+						
 						$.ajax({
 							type:"patch",
-							data:"TESTABCDEF",
+							data:TestJSON,
 //							url:"https://www.thef2e.com/api/isSignUp",
 							url:"https://bountyworkers.net/api/task-report",
 							success: function (data, status) {
 								alert("Status: " + status);
 							},
-							error: function (xhr, ajaxOptions, thrownError) {
-								console.log(xhr.responseText);
+//							error: function (xhr, ajaxOptions, thrownError) {
+//								console.log(xhr.responseText);
+//							}
+							error: function(data, error)
+							{
+							    console.log(jQuery.parseJSON(data.responseText).message);
 							}
 						});
 
