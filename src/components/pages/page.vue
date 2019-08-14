@@ -45,7 +45,8 @@
 	firebase.initializeApp(config);
 
 	var BaseballRef = firebase.database().ref('Baseball');
-	var Error_BaseballRef = firebase.database().ref('Error_Baseball');
+//	var Error_BaseballRef = firebase.database().ref('Error_Baseball');
+	var UserAnswer_BaseballRef = firebase.database().ref('UserAnswer_BaseballRef');
 	var idArray = Array();
 	var groupArray = Array();
 	var PlayerListGroup = Array();
@@ -425,8 +426,20 @@
 						}
 					}
 
+					function getNowTime(){
+						var timeDate= new Date();
+						var tMonth = (timeDate.getMonth()+1) > 9 ? (timeDate.getMonth()+1) : '0'+(timeDate.getMonth()+1);
+						var tDate = timeDate.getDate() > 9 ? timeDate.getDate() : '0'+timeDate.getDate();
+						var tHours = timeDate.getHours() > 9 ? timeDate.getHours() : '0'+timeDate.getHours();
+						var tMinutes = timeDate.getMinutes() > 9 ? timeDate.getMinutes() : '0'+timeDate.getMinutes();
+						var tSeconds = timeDate.getSeconds() > 9 ? timeDate.getSeconds() : '0'+timeDate.getSeconds();
+						return timeDate= timeDate.getFullYear()+'-'+ tMonth +'-'+ tDate +' '+ tHours +':'+ tMinutes +':'+ tSeconds;
+					}
+
 					$('#h5').on('click', '.finish', function() {
-							
+						
+						var User_Answer_Result;
+						
 						console.log("URL_id = " + URL_id)
 						
 						var TestJSON = JSON.stringify
@@ -440,14 +453,10 @@
 						$.ajax({
 							type:"patch",
 							data:TestJSON,
-//							url:"https://www.thef2e.com/api/isSignUp",
 							url:"https://bountyworkers.net/api/task-report",
 							success: function (data, status) {
 								alert("Status: " + status);
 							},
-//							error: function (xhr, ajaxOptions, thrownError) {
-//								console.log(xhr.responseText);
-//							}
 							error: function(data, error)
 							{
 							    console.log(jQuery.parseJSON(data.responseText).message);
@@ -513,8 +522,9 @@
 											if((DB_Log != Input_Log) && ((DB_Log != '') || (Input_Log != '/'))) {
 												console.log('False: ' + DB_Log + ' V.S. ' + Input_Log)
 												return false;
-											} else
+											} else {
 												return true;
+											}
 										}
 
 										if(LogCompare(snapshot.val().Player, dataArray[index][0]) &&
@@ -527,7 +537,7 @@
 											LogCompare(snapshot.val().result, dataArray[index][7])) {} else {
 											Comp = false;
 										}
-
+											
 									})
 
 									$('#input_Player' + idArray[key][index]).attr('disabled', true);
@@ -550,18 +560,36 @@
 									return false;
 							}
 
-							if(GroupCompare())
+							if(GroupCompare()) {
+								User_Answer_Result = 'True';
 								console.log('Input True')
-							else
+							}
+							else {
+								User_Answer_Result = 'False';
 								console.log('Input False')
+							}
+							
+							for(var index in idArray[key]) {
 
+								BaseballRef.child(idArray[key][index]).once('value', function(snapshot) {
+
+									UserAnswer_BaseballRef.child(URL_id).child(getNowTime()).child(key).child(idArray[key][index]).set({
+										User_Base1: snapshot.val().base1,
+										User_Base2: snapshot.val().base2,
+										User_Base3: snapshot.val().base3,
+										Answer_Base1: dataArray[index][1],
+										Answer_Base2: dataArray[index][2],
+										Answer_Base3: dataArray[index][3],
+										Answer_Log: snapshot.val().log,
+										Result: User_Answer_Result
+									})
+								})
+							}
 						}
-
 					});
 
 				}, i * 1000);
 			};
-
 			funcA(funcB);
 		}
 	}
