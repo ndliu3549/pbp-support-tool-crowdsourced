@@ -439,6 +439,7 @@
 					$('#h5').on('click', '.finish', function() {
 						
 						var User_Answer_Result;
+						var Commit_Time = getNowTime();
 						
 						console.log("URL_id = " + URL_id)
 						
@@ -573,7 +574,7 @@
 
 								BaseballRef.child(idArray[key][index]).once('value', function(snapshot) {
 
-									UserAnswer_BaseballRef.child(URL_id).child(getNowTime()).child(key).child(idArray[key][index]).set({
+									UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child(key).child(idArray[key][index]).set({
 										User_Base1: snapshot.val().base1,
 										User_Base2: snapshot.val().base2,
 										User_Base3: snapshot.val().base3,
