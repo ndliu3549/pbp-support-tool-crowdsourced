@@ -45,7 +45,6 @@
 	firebase.initializeApp(config);
 
 	var BaseballRef = firebase.database().ref('Baseball');
-//	var Error_BaseballRef = firebase.database().ref('Error_Baseball');
 	var UserAnswer_BaseballRef = firebase.database().ref('UserAnswer_BaseballRef');
 	var idArray = Array();
 	var groupArray = Array();
@@ -55,43 +54,10 @@
 		name: 'App',
 		data() {
 			return {
-				ImportData: [],
-				isShow: false,
-				exportjson: [],
-				json_fields: {
-					'base1': 'base1',
-					'base2': 'base2',
-					'base3': 'base3',
-					'direction': 'direction',
-					'game': 'game',
-					'id': 'id',
-					'inning': 'inning',
-					'log': 'log',
-					'out': 'out',
-					'Player': 'Player',
-					'result': 'result',
-					'team': 'team'
-				},
+				ImportData: []
 			}
 		},
 		methods: {
-			patchRequest() {
-
-				console.log('hello')
-
-				this.$http.get('https://jsonplaceholder.typicode.com/users').then((response) => {
-					console.log('成功')
-					// success callback
-				}, (response) => {
-					console.log('失敗')
-					// error callback
-				});
-			},
-			addOption(list, text, value) {
-				var index = list.options.length;
-				list.options[index] = new Option(text, value);
-				list.selectedIndex = index;
-			},
 			getUrlKey(name) {
 				return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
 			},
@@ -369,9 +335,6 @@
 						}
 						console.log('PlayerListGroup.length = ' + testIndex)
 
-//						console.log('URL_id = ' + URL_id)
-//
-//						URL_id = '1234'
 					}
 
 					list = `
@@ -438,8 +401,17 @@
 
 					$('#h5').on('click', '.finish', function() {
 						
+						$('#finish.finish.btn.btn-secondary').attr('disabled', true);
+						
 						var User_Answer_Result;
 						var Commit_Time = getNowTime();
+						var Commit_Accuracy = 0;
+						var Inning_Index = '';
+						var Inning_Counter = 0;
+						
+						var csv_header = "Inning_Index,Answer_Base1,Answer_Base2, \
+							Answer_Base3,Answer_Log,Result,User_Base1,User_Base2,User_Base3\n";
+						var csv_data = '';
 						
 						console.log("URL_id = " + URL_id)
 						
@@ -463,6 +435,19 @@
 							    console.log(jQuery.parseJSON(data.responseText).message);
 							}
 						});
+
+						function createCsvFile(data) {
+							var fileName = 'UserID_' + URL_id + '[' + Commit_Time + ']' + ".csv"; //匯出的檔名
+							var blob = new Blob([data], {
+								type : "application/octet-stream"
+							});
+							var href = URL.createObjectURL(blob);
+							var link = document.createElement("a");
+							document.body.appendChild(link);
+							link.href = href;
+							link.download = fileName;
+							link.click();
+						}
 
 						for(var i = 0; i < R_group.length; i++) {
 
@@ -492,23 +477,15 @@
 							}
 
 							for(var index in idArray[key]) {
-
-								$('#input_Player' + idArray[key][index]).attr('disabled', false);
-								
 								if (!document.getElementById( 'input_base1' + idArray[key][index] )) {
-									$('#input_err_base1' + idArray[key][index]).attr('disabled', false);
-									$('#input_err_base2' + idArray[key][index]).attr('disabled', false);
-									$('#input_err_base3' + idArray[key][index]).attr('disabled', false);
+									$('#input_err_base1' + idArray[key][index]).attr('disabled', true);
+									$('#input_err_base2' + idArray[key][index]).attr('disabled', true);
+									$('#input_err_base3' + idArray[key][index]).attr('disabled', true);
 								} else {
-									$('#input_base1' + idArray[key][index]).attr('disabled', false);
-									$('#input_base2' + idArray[key][index]).attr('disabled', false);
-									$('#input_base3' + idArray[key][index]).attr('disabled', false);
+									$('#input_base1' + idArray[key][index]).attr('disabled', true);
+									$('#input_base2' + idArray[key][index]).attr('disabled', true);
+									$('#input_base3' + idArray[key][index]).attr('disabled', true);
 								}
-
-								$('#input_id' + idArray[key][index]).attr('disabled', false);
-								$('#input_direction' + idArray[key][index]).attr('disabled', false);
-								$('#input_out' + idArray[key][index]).attr('disabled', false);
-								$('#input_result' + idArray[key][index]).attr('disabled', false);
 							}
 
 							function GroupCompare() {
@@ -521,9 +498,9 @@
 
 										function LogCompare(DB_Log, Input_Log) {
 											if((DB_Log != Input_Log) && ((DB_Log != '') || (Input_Log != '/'))) {
-												console.log('False: ' + DB_Log + ' V.S. ' + Input_Log)
 												return false;
-											} else {
+											}
+											else {
 												return true;
 											}
 										}
@@ -535,30 +512,22 @@
 											LogCompare(snapshot.val().id, dataArray[index][4]) &&
 											LogCompare(snapshot.val().direction, dataArray[index][5]) &&
 											LogCompare(snapshot.val().out, dataArray[index][6]) &&
-											LogCompare(snapshot.val().result, dataArray[index][7])) {} else {
-											Comp = false;
+											LogCompare(snapshot.val().result, dataArray[index][7])) {
+												
+											} else {
+												Comp = false;
 										}
 											
 									})
-
-									$('#input_Player' + idArray[key][index]).attr('disabled', true);
-									$('#input_base1' + idArray[key][index]).attr('disabled', true);
-									$('#input_base2' + idArray[key][index]).attr('disabled', true);
-									$('#input_base3' + idArray[key][index]).attr('disabled', true);
-									$('#input_id' + idArray[key][index]).attr('disabled', true);
-									$('#input_direction' + idArray[key][index]).attr('disabled', true);
-									$('#input_out' + idArray[key][index]).attr('disabled', true);
-									$('#input_result' + idArray[key][index]).attr('disabled', true);
-									$('#summit_modify' + idArray[key][index]).attr('disabled', true);
-
-									$('#enable_modify' + idArray[key][index]).attr('disabled', false);
-
 								}
 
-								if(Comp)
+								if(Comp) {
+									Commit_Accuracy++;
 									return true;
-								else
+								}
+								else {
 									return false;
+								}
 							}
 
 							if(GroupCompare()) {
@@ -575,18 +544,40 @@
 								BaseballRef.child(idArray[key][index]).once('value', function(snapshot) {
 
 									UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child(key).child(idArray[key][index]).set({
-										User_Base1: snapshot.val().base1,
-										User_Base2: snapshot.val().base2,
-										User_Base3: snapshot.val().base3,
-										Answer_Base1: dataArray[index][1],
-										Answer_Base2: dataArray[index][2],
-										Answer_Base3: dataArray[index][3],
+										User_Base1: dataArray[index][1],
+										User_Base2: dataArray[index][2],
+										User_Base3: dataArray[index][3],
+										Answer_Base1: snapshot.val().base1,
+										Answer_Base2: snapshot.val().base2,
+										Answer_Base3: snapshot.val().base3,
 										Answer_Log: snapshot.val().log,
 										Result: User_Answer_Result
 									})
+									
+									if (Inning_Index == key)
+										csv_data = csv_data + ' ' + ',';
+									else {
+										Inning_Counter++;
+										Inning_Index = key;
+										csv_data = csv_data + Inning_Counter + ',';
+									}
+									
+									csv_data = csv_data
+									+ snapshot.val().base1 + ',' + snapshot.val().base2 + ',' 
+									+ snapshot.val().base3 + ',' + snapshot.val().log + ',' 
+									+ User_Answer_Result + ',' + dataArray[index][1] + ',' 
+									+ dataArray[index][2] + ',' + dataArray[index][3] + '\n';
 								})
 							}
 						}
+						
+//						+ 'Average_Commit_Accuracy' + Average_Commit_Accuracy/20*100 + '%]' 
+						
+						csv_data = '[' + Commit_Time + ']' + ',' 
+									+ 'Commit_Accuracy [' + Commit_Accuracy/20*100 + '%]' + ',' 
+									+ '\n' + csv_header + csv_data;
+							
+						createCsvFile(csv_data);
 					});
 
 				}, i * 1000);
