@@ -410,7 +410,7 @@
 						var Inning_Counter = 0;
 						
 						var csv_header = "Inning_Index,Answer_Base1,Answer_Base2, \
-							Answer_Base3,Answer_Log,Result,User_Base1,User_Base2,User_Base3\n";
+							Answer_Base3,Result,User_Base1,User_Base2,User_Base3,Answer_Log\n";
 						var csv_data = '';
 						
 						console.log("URL_id = " + URL_id)
@@ -554,8 +554,10 @@
 										Result: User_Answer_Result
 									})
 									
-									if (Inning_Index == key)
+									if (Inning_Index == key) {
 										csv_data = csv_data + ' ' + ',';
+										User_Answer_Result = '';
+									}
 									else {
 										Inning_Counter++;
 										Inning_Index = key;
@@ -564,14 +566,14 @@
 									
 									csv_data = csv_data
 									+ snapshot.val().base1 + ',' + snapshot.val().base2 + ',' 
-									+ snapshot.val().base3 + ',' + snapshot.val().log + ',' 
-									+ User_Answer_Result + ',' + dataArray[index][1] + ',' 
-									+ dataArray[index][2] + ',' + dataArray[index][3] + '\n';
+									+ snapshot.val().base3 + ',' + User_Answer_Result + ',' 
+									+ dataArray[index][1] + ','+ dataArray[index][2] + ',' 
+									+ dataArray[index][3] + ',' + snapshot.val().log + '\n';
 								})
 							}
 						}
 						
-//						+ 'Average_Commit_Accuracy' + Average_Commit_Accuracy/20*100 + '%]' 
+//						+ 'Average_Commit_Accuracy [' + Average_Commit_Accuracy/20*100 + '%]' 
 						
 						csv_data = '[' + Commit_Time + ']' + ',' 
 									+ 'Commit_Accuracy [' + Commit_Accuracy/20*100 + '%]' + ',' 
