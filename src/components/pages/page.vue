@@ -539,6 +539,8 @@
 								console.log('Input False')
 							}
 							
+							UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child(key).child('Result').set(User_Answer_Result);
+							
 							for(var index in idArray[key]) {
 
 								BaseballRef.child(idArray[key][index]).once('value', function(snapshot) {
@@ -551,7 +553,6 @@
 										Answer_Base2: snapshot.val().base2,
 										Answer_Base3: snapshot.val().base3,
 										Answer_Log: snapshot.val().log,
-										Result: User_Answer_Result
 									})
 									
 									if (Inning_Index == key) {
@@ -573,6 +574,15 @@
 							}
 						}
 						
+						UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child('Commit_Accuracy').set(Commit_Accuracy/20);
+
+//						UserAnswer_BaseballRef.child(URL_id).once('value', function(snapshot) {
+//							let val = snapshot.val();
+//							$.each(val, function(i, item) {
+//								
+//							}
+//						}
+
 //						+ 'Average_Commit_Accuracy [' + Average_Commit_Accuracy/20*100 + '%]' 
 						
 						csv_data = '[' + Commit_Time + ']' + ',' 
