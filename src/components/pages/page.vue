@@ -77,30 +77,6 @@
 
 				$('h6').html(list)
 			},
-			getImport() {
-
-				let vm = this
-
-				$(document).ready(function() {
-					$('#files').bind('change', handleFileSelect);
-				});
-
-				function handleFileSelect(evt) {
-					var files = evt.target.files;
-					var file = files[0];
-
-					printTable(file);
-				}
-
-				function printTable(file) {
-					var reader = new FileReader();
-					reader.readAsText(file);
-					reader.onload = function(event) {
-						var csv = event.target.result;
-						vm.ImportData = $.csv.toObjects(csv);
-					};
-				}
-			},
 			getView(URL_id) {
 
 				BaseballRef.on('value', function(snapshot) {
@@ -145,8 +121,6 @@
 			}
 		},
 		mounted() {
-
-			this.getImport();
 
 			let URL_id = this.getUrlKey('id');
 
