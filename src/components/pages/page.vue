@@ -406,6 +406,7 @@
 						var User_Answer_Result;
 						var Commit_Time = getNowTime();
 						var Commit_Accuracy = 0;
+						var Average_Commit_Accuracy = 0;
 						var Inning_Index = '';
 						var Inning_Counter = 0;
 						
@@ -576,20 +577,23 @@
 						
 						UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child('Commit_Accuracy').set(Commit_Accuracy/20);
 
-//						UserAnswer_BaseballRef.child(URL_id).once('value', function(snapshot) {
-//							let val = snapshot.val();
-//							$.each(val, function(i, item) {
-//								
-//							}
-//						}
-
-//						+ 'Average_Commit_Accuracy [' + Average_Commit_Accuracy/20*100 + '%]' 
-						
-						csv_data = '[' + Commit_Time + ']' + ',' 
-									+ 'Commit_Accuracy [' + Commit_Accuracy/20*100 + '%]' + ',' 
-									+ '\n' + csv_header + csv_data;
+						UserAnswer_BaseballRef.child(URL_id).once('value', function(snapshot) {
+							let val = snapshot.val();
+							var Total_number = 0;
+							$.each(val, function(i, item) {
+								Total_number++;
+								Average_Commit_Accuracy = Average_Commit_Accuracy + item.Commit_Accuracy;
+							});
+							Average_Commit_Accuracy = Math.round( Average_Commit_Accuracy / Total_number * 100 ) / 100;
+							console.log('Average_Commit_Accuracy = ' + Average_Commit_Accuracy);
 							
-						createCsvFile(csv_data);
+							csv_data = '[' + Commit_Time + ']' + ',' 
+								+ 'Commit_Accuracy [' + Commit_Accuracy/20*100 + '%]' + ',' 
+								+ 'Average_Commit_Accuracy [' + Average_Commit_Accuracy*100 + '%]' + ',' 
+								+ '\n' + csv_header + csv_data;
+							
+							createCsvFile(csv_data);
+						});
 					});
 
 				}, i * 1000);
