@@ -378,9 +378,9 @@
 						$('#finish.finish.btn.btn-secondary').attr('disabled', true);
 						
 						var User_Answer_Result;
-						var Commit_Time = getNowTime();
-						var Commit_Accuracy = 0;
-						var Average_Commit_Accuracy = 0;
+						var Submit_Time = getNowTime();
+						var Submit_Accuracy = 0;
+						var Average_Submit_Accuracy = 0;
 						var Inning_Index = '';
 						var Inning_Counter = 0;
 						
@@ -412,7 +412,7 @@
 						});
 
 						function createCsvFile(data) {
-							var fileName = 'UserID_' + URL_id + '[' + Commit_Time + ']' + ".csv"; //匯出的檔名
+							var fileName = 'UserID_' + URL_id + '[' + Submit_Time + ']' + ".csv"; //匯出的檔名
 							var blob = new Blob([data], {
 								type : "application/octet-stream"
 							});
@@ -497,7 +497,7 @@
 								}
 
 								if(Comp) {
-									Commit_Accuracy++;
+									Submit_Accuracy++;
 									return true;
 								}
 								else {
@@ -514,13 +514,13 @@
 								console.log('Input False')
 							}
 							
-							UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child(key).child('Result').set(User_Answer_Result);
+							UserAnswer_BaseballRef.child(URL_id).child(Submit_Time).child(key).child('Result').set(User_Answer_Result);
 							
 							for(var index in idArray[key]) {
 
 								BaseballRef.child(idArray[key][index]).once('value', function(snapshot) {
 
-									UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child(key).child(idArray[key][index]).set({
+									UserAnswer_BaseballRef.child(URL_id).child(Submit_Time).child(key).child(idArray[key][index]).set({
 										User_Base1: dataArray[index][1],
 										User_Base2: dataArray[index][2],
 										User_Base3: dataArray[index][3],
@@ -549,21 +549,21 @@
 							}
 						}
 						
-						UserAnswer_BaseballRef.child(URL_id).child(Commit_Time).child('Commit_Accuracy').set(Commit_Accuracy/20);
+						UserAnswer_BaseballRef.child(URL_id).child(Submit_Time).child('Submit_Accuracy').set(Submit_Accuracy/20);
 
 						UserAnswer_BaseballRef.child(URL_id).once('value', function(snapshot) {
 							let val = snapshot.val();
 							var Total_number = 0;
 							$.each(val, function(i, item) {
 								Total_number++;
-								Average_Commit_Accuracy = Average_Commit_Accuracy + item.Commit_Accuracy;
+								Average_Submit_Accuracy = Average_Submit_Accuracy + item.Submit_Accuracy;
 							});
-							Average_Commit_Accuracy = Math.round( Average_Commit_Accuracy / Total_number * 100 ) / 100;
-							console.log('Average_Commit_Accuracy = ' + Average_Commit_Accuracy);
+							Average_Submit_Accuracy = Math.round( Average_Submit_Accuracy / Total_number * 100 ) / 100;
+							console.log('Average_Submit_Accuracy = ' + Average_Submit_Accuracy);
 							
-							csv_data = '[' + Commit_Time + ']' + ',' 
-								+ 'Commit_Accuracy [' + Commit_Accuracy/20*100 + '%]' + ',' 
-								+ 'Average_Commit_Accuracy [' + Average_Commit_Accuracy*100 + '%]' + ',' 
+							csv_data = '[' + Submit_Time + ']' + ',' 
+								+ 'Submit_Accuracy [' + Submit_Accuracy/20*100 + '%]' + ',' 
+								+ 'Average_Submit_Accuracy [' + Average_Submit_Accuracy*100 + '%]' + ',' 
 								+ '\n' + csv_header + csv_data;
 							
 							createCsvFile(csv_data);
